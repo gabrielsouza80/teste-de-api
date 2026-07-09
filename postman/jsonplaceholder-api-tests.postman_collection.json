@@ -1,0 +1,732 @@
+{
+  "info": {
+    "_postman_id": "7b5f9a8a-0d0e-4d58-9d9d-4d0d5dcb8a42",
+    "name": "API Testing Portfolio – JSONPlaceholder",
+    "description": "Portfolio-grade API test suite for JSONPlaceholder with positive, negative, and basic contract validations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "GET /posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is below 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Response body is JSON', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "  pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Posts array is not empty', function () {",
+                  "  pm.expect(json.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('Each post has the expected contract fields', function () {",
+                  "  json.forEach(function (post) {",
+                  "    pm.expect(post).to.have.property('id').that.is.a('number');",
+                  "    pm.expect(post).to.have.property('userId').that.is.a('number');",
+                  "    pm.expect(post).to.have.property('title').that.is.a('string');",
+                  "    pm.expect(post).to.have.property('body').that.is.a('string');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /posts/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{validPostId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{validPostId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedPostId = Number(pm.variables.get('validPostId'));",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is below 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Response body is JSON object', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Required fields exist', function () {",
+                  "  pm.expect(json).to.have.property('id').that.is.a('number').and.eql(expectedPostId);",
+                  "  pm.expect(json).to.have.property('userId').that.is.a('number');",
+                  "  pm.expect(json).to.have.property('title').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('body').that.is.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /posts/{id}/comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{validPostId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{validPostId}}",
+                "comments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedPostId = Number(pm.variables.get('validPostId'));",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is JSON array', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Comments array contains only the expected postId', function () {",
+                  "  json.forEach(function (comment) {",
+                  "    pm.expect(comment).to.have.property('postId').that.is.a('number').and.eql(expectedPostId);",
+                  "    pm.expect(comment).to.have.property('id').that.is.a('number');",
+                  "    pm.expect(comment).to.have.property('name').that.is.a('string');",
+                  "    pm.expect(comment).to.have.property('email').that.is.a('string');",
+                  "    pm.expect(comment).to.have.property('body').that.is.a('string');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /posts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{newPostTitle}}\",\n  \"body\": \"{{newPostBody}}\",\n  \"userId\": {{newPostUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedTitle = pm.variables.get('newPostTitle');",
+                  "const expectedBody = pm.variables.get('newPostBody');",
+                  "const expectedUserId = Number(pm.variables.get('newPostUserId'));",
+                  "",
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.expect(pm.response.code).to.eql(201);",
+                  "});",
+                  "",
+                  "pm.test('Response time is below 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Response body is JSON object', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Created post contains required fields', function () {",
+                  "  pm.expect(json).to.have.property('id').that.is.a('number');",
+                  "  pm.expect(json).to.have.property('title').that.is.a('string').and.eql(expectedTitle);",
+                  "  pm.expect(json).to.have.property('body').that.is.a('string').and.eql(expectedBody);",
+                  "  pm.expect(json).to.have.property('userId').that.is.a('number').and.eql(expectedUserId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PUT /posts/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{validPostId}},\n  \"title\": \"{{updatedPostTitle}}\",\n  \"body\": \"This post was fully replaced during testing.\",\n  \"userId\": {{newPostUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{validPostId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{validPostId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedPostId = Number(pm.variables.get('validPostId'));",
+                  "const expectedTitle = pm.variables.get('updatedPostTitle');",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is JSON object', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Full update returns the expected contract', function () {",
+                  "  pm.expect(json).to.have.property('id').that.is.a('number').and.eql(expectedPostId);",
+                  "  pm.expect(json).to.have.property('title').that.is.a('string').and.eql(expectedTitle);",
+                  "  pm.expect(json).to.have.property('body').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('userId').that.is.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "PATCH /posts/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{patchedPostTitle}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{validPostId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{validPostId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedPostId = Number(pm.variables.get('validPostId'));",
+                  "const expectedTitle = pm.variables.get('patchedPostTitle');",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Partial update keeps JSON contract intact', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(json).to.have.property('id').that.is.a('number').and.eql(expectedPostId);",
+                  "  pm.expect(json).to.have.property('title').that.is.a('string').and.eql(expectedTitle);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "DELETE /posts/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{validPostId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{validPostId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('DELETE response is a JSON object', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(Object.keys(json).length).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Comments and Todos",
+      "item": [
+        {
+          "name": "GET /comments?postId={id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments?postId={{validPostId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "{{validPostId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedPostId = Number(pm.variables.get('validPostId'));",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Filtered comments response is an array', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each comment belongs to the selected postId', function () {",
+                  "  json.forEach(function (comment) {",
+                  "    pm.expect(comment.postId).to.eql(expectedPostId);",
+                  "    pm.expect(comment.id).to.be.a('number');",
+                  "    pm.expect(comment.name).to.be.a('string');",
+                  "    pm.expect(comment.email).to.be.a('string');",
+                  "    pm.expect(comment.body).to.be.a('string');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /todos?completed=true",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/todos?completed=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "completed",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Filtered todos response is an array', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Every todo is completed', function () {",
+                  "  json.forEach(function (todo) {",
+                  "    pm.expect(todo).to.have.property('completed', true);",
+                  "    pm.expect(todo).to.have.property('id').that.is.a('number');",
+                  "    pm.expect(todo).to.have.property('userId').that.is.a('number');",
+                  "    pm.expect(todo).to.have.property('title').that.is.a('string');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /users/{id}/todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{validUserId}}/todos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{validUserId}}",
+                "todos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedUserId = Number(pm.variables.get('validUserId'));",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Todos response is an array', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each todo belongs to the selected user', function () {",
+                  "  json.forEach(function (todo) {",
+                  "    pm.expect(todo).to.have.property('userId').that.is.a('number').and.eql(expectedUserId);",
+                  "    pm.expect(todo).to.have.property('id').that.is.a('number');",
+                  "    pm.expect(todo).to.have.property('title').that.is.a('string');",
+                  "    pm.expect(todo).to.have.property('completed').that.is.a('boolean');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Users response is an array', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  pm.expect(json.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('Each user has the expected contract', function () {",
+                  "  json.forEach(function (user) {",
+                  "    pm.expect(user).to.have.property('id').that.is.a('number');",
+                  "    pm.expect(user).to.have.property('name').that.is.a('string');",
+                  "    pm.expect(user).to.have.property('username').that.is.a('string');",
+                  "    pm.expect(user).to.have.property('email').that.is.a('string');",
+                  "    pm.expect(user).to.have.property('address').that.is.an('object');",
+                  "    pm.expect(user.address).to.have.property('street').that.is.a('string');",
+                  "    pm.expect(user.address).to.have.property('city').that.is.a('string');",
+                  "    pm.expect(user.address).to.have.property('geo').that.is.an('object');",
+                  "    pm.expect(user.address.geo).to.have.property('lat').that.is.a('string');",
+                  "    pm.expect(user.address.geo).to.have.property('lng').that.is.a('string');",
+                  "    pm.expect(user).to.have.property('phone').that.is.a('string');",
+                  "    pm.expect(user).to.have.property('website').that.is.a('string');",
+                  "    pm.expect(user).to.have.property('company').that.is.an('object');",
+                  "    pm.expect(user.company).to.have.property('name').that.is.a('string');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /users/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{validUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{validUserId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const expectedUserId = Number(pm.variables.get('validUserId'));",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is JSON object', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Required fields exist on the selected user', function () {",
+                  "  pm.expect(json).to.have.property('id').that.is.a('number').and.eql(expectedUserId);",
+                  "  pm.expect(json).to.have.property('name').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('username').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('email').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('address').that.is.an('object');",
+                  "  pm.expect(json).to.have.property('phone').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('website').that.is.a('string');",
+                  "  pm.expect(json).to.have.property('company').that.is.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative and Edge Cases",
+      "item": [
+        {
+          "name": "GET /todos?completed=invalid",
+          "description": "Negative example: invalid filter value. JSONPlaceholder is a fake API, so this request is used to verify graceful handling rather than strict server-side validation.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/todos?completed={{invalidCompletedValue}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "completed",
+                  "value": "{{invalidCompletedValue}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Invalid query value returns an array', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  pm.expect(json.length).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /posts - incomplete payload",
+          "description": "Negative example: incomplete payload. JSONPlaceholder accepts the request and still returns a success response, which is documented here as a limitation of the mock API.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incomplete payload demo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Status code is 201 even with a minimal payload', function () {",
+                  "  pm.expect(pm.response.code).to.eql(201);",
+                  "});",
+                  "",
+                  "pm.test('Mock API still returns a JSON object with an id', function () {",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(json).to.have.property('id').that.is.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}
