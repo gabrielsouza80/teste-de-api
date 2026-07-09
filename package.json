@@ -1,0 +1,16 @@
+{
+  "name": "api-testing-portfolio-jsonplaceholder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API Testing portfolio for JSONPlaceholder using Postman, Newman, and GitHub Actions.",
+  "scripts": {
+    "test": "npm run test:api",
+    "test:api": "newman run ./postman/jsonplaceholder-api-tests.postman_collection.json -e ./postman/jsonplaceholder-environment.postman_environment.json --bail",
+    "pretest:report": "node -e \"require('fs').mkdirSync('reports', { recursive: true })\"",
+    "test:report": "newman run ./postman/jsonplaceholder-api-tests.postman_collection.json -e ./postman/jsonplaceholder-environment.postman_environment.json -r cli,htmlextra --reporter-htmlextra-export ./reports/newman-report.html"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1"
+  }
+}
